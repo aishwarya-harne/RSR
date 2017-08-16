@@ -486,6 +486,8 @@ def export(request):
     return render (request, 'export.html')
 
 @login_required
+########### LINK ANALYSIS ##########
+######## Taking the output of the query set and storing in a dataframe to use for Link Analysis ########
 def linkanalysis(request):
     query_set = Person.objects.all()
     query = request.GET.get("q")
@@ -509,6 +511,7 @@ def linkanalysis(request):
             #new_entry[key] = request.GET[key]
         df = df.append(new_entry,ignore_index = True)
     print(personFilter.queryset)
+    ########## Calling the Funciton to make network graphs ##########
     make_LA(df)
     return render(request, 'SearchExport/search.html', {'personFilter': personFilter})
 
@@ -517,6 +520,7 @@ def make_LA(df):
     Columns=list(df)
     print(len(Columns))
     i=0
+    ########## Iterating through columns in dataframes to make connections and adding edges for Links ########
     for column in Columns:
         G=nx.from_pandas_dataframe(df,df.columns[0],column)
         G.add_edges_from(G.edges())
@@ -528,7 +532,7 @@ def make_LA(df):
 
     Nodes = G.number_of_nodes()
     Edges = G.number_of_edges()
-
+    ########## Different layouts to form network graphs from the dataframe ##########
     pos = nx.spring_layout(G,k=0.9,iterations=1, scale=2)
     #pos = nx.shell_layout(G)
     #pos = nx.nx_pydot.graphviz_layout(G, prog = 'dot')
